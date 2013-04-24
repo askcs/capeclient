@@ -8,7 +8,7 @@ $form-color: scale-color(desaturate($base, 15%), $lightness: 91%);
   top: 0;
   position: fixed;        
   width: 100%;
-  background-color: #C0392B;
+  background-color: white;
 }
 
 // Login screen
@@ -22,6 +22,8 @@ $form-color: scale-color(desaturate($base, 15%), $lightness: 91%);
 .login-screen {
   min-height: 317px;
   padding: 123px 199px 33px 306px;
+  // padding: 123px auto 0 auto;
+  // width: 320px;
 }
 
 .login-icon {
@@ -39,6 +41,8 @@ $form-color: scale-color(desaturate($base, 15%), $lightness: 91%);
     font-weight: 200;
     line-height: 34px;
     opacity: 0.95;
+    color: $firm;
+    
     small {
       color: inherit;
       display: block;
