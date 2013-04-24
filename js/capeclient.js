@@ -8,6 +8,7 @@
  */
 angular.module('CapeClient',[
   // modals
+  'CapeClient.Modals.Cape',
   // controller
   'CapeClient.Controllers.Login',
   'CapeClient.Controllers.Dashboard',

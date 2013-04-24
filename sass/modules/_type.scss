@@ -9,7 +9,7 @@ a {
   text-decoration: underline;
   @include transition(0.25s);
   &:hover {
-    color: $success;
+    color: #34495E;
     text-decoration: none;
   }
 }

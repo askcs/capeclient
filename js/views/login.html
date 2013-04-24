@@ -2,27 +2,29 @@
 	<div class="container">
 
 	  <div class="login">
-	    <div class="login-screen">
-	      <div class="login-icon">
-	        <img src="img/ask/ask.png" alt="Welcome to Ask Community Systems" />
-	        <h4>Welcome to <small>Ask</small></h4>
-	      </div>
+	  	<form ng-submit="login()">  	
+		    <div class="login-screen">
+		      <div class="login-icon">
+		        <img src="img/ask/ask.png" alt="Welcome to Ask Community Systems" />
+		        <h4>Welcome to <small>AskXMPP</small></h4>
+		      </div>
 
-	      <div class="login-form">
-	        <div class="control-group">
-	          <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name" autofocus />
-	          <label class="login-field-icon fui-man-16" for="login-name"></label>
-	        </div>
+		      <div class="login-form">
+		        <div class="control-group">
+		          <input type="text" class="login-field" placeholder="Enter your name" id="login-name" ng-model="user.name" autofocus />
+		          <label class="login-field-icon fui-man-16" for="login-name"></label>
+		        </div>
 
-	        <div class="control-group">
-	          <input type="password" class="login-field" value="" placeholder="Password" id="login-pass" />
-	          <label class="login-field-icon fui-lock-16" for="login-pass"></label>
-	        </div>
+		        <div class="control-group">
+		          <input type="password" class="login-field" placeholder="Password" id="login-pass" ng-model="user.password" />
+		          <label class="login-field-icon fui-lock-16" for="login-pass"></label>
+		        </div>
 
-	        <a class="btn btn-primary btn-large btn-block" href="#">Login</a>
-	        <a class="login-link" href="#">Lost your password?</a>
-	      </div>
-	    </div>
+		        <button class="btn btn-primary btn-large btn-block" type="submit">Login</button>
+		        <a class="login-link" href="#">Lost your password?</a>
+		      </div>
+		    </div>
+	  	</form>
 	  </div>
 
 	</div>
