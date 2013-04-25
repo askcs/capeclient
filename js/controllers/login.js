@@ -18,13 +18,8 @@ angular.module('CapeClient.Controllers.Login', [])
 		 * User credentials container
 		 */
 		$scope.user = {
-			name: 		'',
-			password: ''
+			name:			'sstam',
+			password: 'askask'
 		};
-
-		$scope.login = function ()
-		{
-			Cape.login($scope.user.name, $scope.user.password);
-		}
 	}
 ]);

@@ -2,11 +2,12 @@
 	<div class="container">
 
 	  <div class="login">
-	  	<form ng-submit="login()">  	
+	  	<form ng-submit="login(user)">  	
 		    <div class="login-screen">
+
 		      <div class="login-icon">
 		        <img src="img/ask/ask.png" alt="Welcome to Ask Community Systems" />
-		        <h4>Welcome to <small>AskXMPP</small></h4>
+		        <h4>Welcome to <small>CapeClient</small></h4>
 		      </div>
 
 		      <div class="login-form">
@@ -21,7 +22,7 @@
 		        </div>
 
 		        <button class="btn btn-primary btn-large btn-block" type="submit">Login</button>
-		        <a class="login-link" href="#">Lost your password?</a>
+		        <a class="login-link" ng-click="logout()">Lost your password?</a>
 		      </div>
 		    </div>
 	  	</form>

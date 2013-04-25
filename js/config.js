@@ -13,5 +13,6 @@ angular.module('CapeClient')
   {
     title:    'CapeClient',
     version:  '1.0.0',
+    host: 		'http://openid.ask-cs.com:5280/http-bind'
   }
 );

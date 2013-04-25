@@ -14,5 +14,6 @@ angular.module('CapeClient.Controllers.Dashboard', [])
 	'$rootScope', '$scope',
 	function ($rootScope, $scope)
 	{
+
 	}
 ]);
