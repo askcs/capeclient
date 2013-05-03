@@ -121,9 +121,13 @@ angular.module('CapeClient')
 angular.module('CapeClient')
 .run(
 [
-  '$rootScope', '$location', 'Cape',
-  function ($rootScope, $location, Cape)
+  '$rootScope', '$location', '$config', 'Cape',
+  function ($rootScope, $location, $config, Cape)
   {
+
+    $rootScope.config = $config;
+
+    
     /**
      * Login
      */

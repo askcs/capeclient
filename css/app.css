@@ -819,7 +819,7 @@ label {
 #footer #copyrights span.muted {
   position: absolute;
   top: 5px;
-  right: 255px;
+  right: 0px;
   float: right;
   width: 200px;
 }

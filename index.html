@@ -47,7 +47,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#dashboard">{{config.profile.title}}</a>
+          <a class="brand" href="#dashboard">CapeClient</a>
           <!-- nav-collapse -->
           <div class="nav-collapse collapse">
             <!-- main nav -->
@@ -58,70 +58,15 @@
               <li data-match-route="/planboard">
                 <a href="#planboard">Planboard</a>
               </li>
-              <li data-match-route="/messages">
-                <a href="#messages">{{ui.message.messages}}
-                  <!-- unread messages -->
-                  <span ng-show="(app.unreadMessages > 0)" class="badge badge-success">
-                    {{app.unreadMessages}}
-                  </span>
-                  <!-- end unread messages -->
-                </a>
-              </li>
-              <li data-match-route="/groups" ng-hide="app.resources.role > 1">
-                <a href="#groups">{{ui.groups.groups}}</a>
-              </li>
             </ul>
             <!-- end main nav -->
 
             <!-- user menu -->
             <!-- desktop version -->
-            <ul class="nav pull-right" ng-hide="browser.mobile">
-              <!-- <li>
-                <a href="#help"><i class="icon-question-sign icon-white"></i> Help & Support</a>
-              </li> -->
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-user icon-white"></i> {{app.resources.name}} <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li>
-                    <a href="#profile"><i class="icon-user"></i> {{ui.profile.profile}}</a>
-                  </li>
-                  <li>
-                    <a href="#settings"><i class="icon-wrench"></i> {{ui.settings.settings}}</a>
-                  </li>
-                  <li class="divider"></li>
-                  <li>
-                    <a href="#logout"><i class="icon-off"></i> {{ui.login.logout}}</a>
-                  </li>
-                </ul>
-              </li>
-              <li id="fullscreener" ng-show="config.fullscreen && browser.webkit">
-                <a ng-click="fullScreen()"><i class="icon-fullscreen icon-white"></i></a>
-              </li>
+            <ul class="nav pull-right">
+              <li><a href="#logout"><i class="icon-off icon-white"></i> Logout</a></li>
             </ul>
             <!-- end desktop version -->
-            <!-- mobile or tablet version -->
-            <ul class="nav pull-right" ng-show="browser.mobile" style="{{(browser.landscape) && 'margin-right:-20px'}}">
-              <li>
-                <a href="#profile">
-                  <i class="icon-user icon-white" ng-hide="browser.portrait || browser.screen.width < 768"></i>
-                  <span ng-show="browser.portrait || browser.screen.width < 768">{{ui.profile.profile}}</span>
-                </a>
-              </li>
-              <li>
-                <a href="#settings">
-                  <i class="icon-wrench icon-white" ng-hide="browser.portrait || browser.screen.width < 768"></i>
-                  <span ng-show="browser.portrait || browser.screen.width < 768">{{ui.settings.settings}}</span>
-                </a>
-              </li>
-              <li>
-                <a href="#logout">
-                  <i class="icon-off icon-white" ng-hide="browser.portrait || browser.screen.width < 768"></i>
-                  <span ng-show="browser.portrait || browser.screen.width < 768">{{ui.login.logout}}</span>
-                </a>
-              </li>
-            </ul>
-            <!-- end mobile or tablet version -->
             <!-- end user menu -->
 
           </div>
@@ -183,19 +128,14 @@
     <!-- end wrap -->
 
     <!-- footer -->
-    <div id="footer" ng-hide="browser.mobile">
+    <div id="footer">
       <div class="container-fluid">
         <div id="copyrights">
           <span class="muted">
             <small>
-              Ask Community Systems, 2013<br><i>WebPaige <a href="version.html" target="_blank">v{{config.version}}</a></i>
+              Ask Community Systems, 2013<br><i>CapeClient <a href="version.html" target="_blank">v{{config.version}}</a></i>
             </small>
           </span>
-          <div id="download-footer">
-            <!-- <button class="btn btn-success btn-large" type="button" bs-tooltip="ui.downloads.app">
-              {{ui.login.downloadApp}}
-            </button> -->
-          </div>
         </div>
         <p class="muted" ng-show="loading.status">
           <img src="img/ajax-loader.gif"><small>{{loading.message}}</small>
