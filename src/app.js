@@ -587,7 +587,7 @@ angular.module('CapeClient',[
   'CapeClient.Modals.Settings',
   // controller
   'CapeClient.Controllers.Login',
-  'CapeClient.Controllers.Dashboard',
+  'CapeClient.Controllers.Planboard',
   'CapeClient.Controllers.Timeline',
   'CapeClient.Controllers.Timeline.Navigation',
   // services
@@ -824,10 +824,10 @@ angular.module('CapeClient')
     /**
      * Get started router
      */
-    .when('/dashboard',
+    .when('/planboard',
     {
-      templateUrl: 'js/views/dashboard.html',
-      controller: 'dashboard'
+      templateUrl: 'js/views/planboard.html',
+      controller: 'planboard'
     })
 
 
@@ -835,7 +835,7 @@ angular.module('CapeClient')
      * Router fallback
      */
     .otherwise({
-      redirectTo: '/login'
+      redirectTo: '/planboard'
     });
   }
 ]);;/*jslint node: true */
@@ -856,6 +856,10 @@ angular.module('CapeClient')
 
     $rootScope.config = $config;
 
+
+    $rootScope.connected = Cape.isConnected();
+    console.warn('connected ->', $rootScope.connected);
+
     
     /**
      * Login
@@ -865,6 +869,9 @@ angular.module('CapeClient')
       Cape.login(user.name, user.password,
         function ()
         {
+          $rootScope.connected = Cape.isConnected();
+          console.warn('connected ->', $rootScope.connected);
+
           $rootScope.$apply(function ()
           {
             $location.path('/dashboard');
@@ -3700,13 +3707,13 @@ angular.module('CapeClient.Controllers.Login', [])
 'use strict';
 
 
-angular.module('CapeClient.Controllers.Dashboard', [])
+angular.module('CapeClient.Controllers.Planboard', [])
 
 
 /**
  * Dashboard controller
  */
-.controller('dashboard',
+.controller('planboard',
 [
 	'$rootScope', '$scope', '$q', '$window', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Cape',
 	function ($rootScope, $scope, $q, $window, $location, Slots, Dater, Storage, Sloter, Cape)
@@ -3716,35 +3723,35 @@ angular.module('CapeClient.Controllers.Dashboard', [])
 		/**
 		 * Get slots
 		 */
-		// Cape.getSlots(null, null, function (results)
-		// {
-		// 	console.log('results ->', results);
+		Cape.getSlots(null, null, function (results)
+		{
+			console.log('results ->', results);
 
-		// 	// $scope.data = {
-		// 	// 	user: results
-		// 	// };
+			// $scope.data = {
+			// 	user: results
+			// };
 
-		// 	// var data = [];
+			// var data = [];
 
-		// 	// angular.forEach(results.result, function (slot, index)
-		// 	// {
-		// 	// 	data.push({
-		// 	// 		start: 		slot.start,
-		// 	// 		end: 			slot.end,
-		// 	// 		content: 	slot.value,
-		// 	// 		group: 		'Planning'
-		// 	// 	});
-		// 	// });
+			// angular.forEach(results.result, function (slot, index)
+			// {
+			// 	data.push({
+			// 		start: 		slot.start,
+			// 		end: 			slot.end,
+			// 		content: 	slot.value,
+			// 		group: 		'Planning'
+			// 	});
+			// });
 
-	 //  //   timeline.draw(data, {
-  //  //      width:  '100%',
-  //  //      height: 'auto',
-  //  //      editable: true,
-  //  //      style: 'box',
-  //  //      showCurrentTime: true,
-  //  //      showNavigation: false
-	 //  //   });
-		// });
+	  //   timeline.draw(data, {
+   //      width:  '100%',
+   //      height: 'auto',
+   //      editable: true,
+   //      style: 'box',
+   //      showCurrentTime: true,
+   //      showNavigation: false
+	  //   });
+		});
 
 
 
@@ -5326,7 +5333,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.getSlots = function (start, end, callback)
       {
-        if (this.stateAgentUrl == null)
+        if (this.stateAgentUrl === null)
           throw "No stateAgent found";
 
         if (start === null)

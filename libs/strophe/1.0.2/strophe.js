@@ -1398,7 +1398,7 @@ Strophe.Builder.prototype = {
      */
     t: function (text)
     {
-        var child = Strophe.xmlTextNode(text);
+        var child = Strophe.xmlGenerator().createTextNode(text);
         this.node.appendChild(child);
         return this;
     }

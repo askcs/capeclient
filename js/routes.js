@@ -26,10 +26,10 @@ angular.module('CapeClient')
     /**
      * Get started router
      */
-    .when('/dashboard',
+    .when('/planboard',
     {
-      templateUrl: 'js/views/dashboard.html',
-      controller: 'dashboard'
+      templateUrl: 'js/views/planboard.html',
+      controller: 'planboard'
     })
 
 
@@ -37,7 +37,7 @@ angular.module('CapeClient')
      * Router fallback
      */
     .otherwise({
-      redirectTo: '/login'
+      redirectTo: '/planboard'
     });
   }
 ]);

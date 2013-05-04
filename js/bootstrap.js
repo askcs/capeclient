@@ -16,6 +16,10 @@ angular.module('CapeClient')
 
     $rootScope.config = $config;
 
+
+    $rootScope.connected = Cape.isConnected();
+    console.warn('connected ->', $rootScope.connected);
+
     
     /**
      * Login
@@ -25,6 +29,9 @@ angular.module('CapeClient')
       Cape.login(user.name, user.password,
         function ()
         {
+          $rootScope.connected = Cape.isConnected();
+          console.warn('connected ->', $rootScope.connected);
+
           $rootScope.$apply(function ()
           {
             $location.path('/dashboard');

@@ -19,7 +19,7 @@ angular.module('CapeClient',[
   'CapeClient.Modals.Settings',
   // controller
   'CapeClient.Controllers.Login',
-  'CapeClient.Controllers.Dashboard',
+  'CapeClient.Controllers.Planboard',
   'CapeClient.Controllers.Timeline',
   'CapeClient.Controllers.Timeline.Navigation',
   // services
