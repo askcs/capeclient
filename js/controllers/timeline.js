@@ -8,8 +8,8 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 .controller('timeline',
 [
-	'$rootScope', '$scope', '$q', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Profile',
-	function ($rootScope, $scope, $q, $location, Slots, Dater, Storage, Sloter, Profile)
+	'$rootScope', '$scope', '$q', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Profile', 'Cape',
+	function ($rootScope, $scope, $q, $location, Slots, Dater, Storage, Sloter, Profile, Cape)
 	{
 		var range, diff;
 
@@ -18,11 +18,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 		 */
 		$scope.$watch(function ()
 		{
-			/**
-			 * If main timeline
-			 */
-			if ($scope.timeline && $scope.timeline.main)
-			{
+
 				range = $scope.self.timeline.getVisibleChartRange();
 				diff  = Dater.calculate.diff(range);
 
@@ -72,22 +68,6 @@ angular.module('CapeClient.Controllers.Timeline', [])
 				$scope.daterange =  Dater.readable.date($scope.timeline.range.start) +
 														' / ' +
 														Dater.readable.date($scope.timeline.range.end);
-			}
-			/**
-			 * User timeline
-			 */
-			else
-			{
-				if ($location.hash() == 'timeline')
-				{
-					range = $scope.self.timeline.getVisibleChartRange();
-
-					$scope.timeline.range = {
-						start:  new Date(range.start).toString(),
-						end:    new Date(range.end).toString()
-					};
-				}
-			}
 		});
 
 
@@ -126,7 +106,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	     * (Re-)Render timeline
 	     */
 	    render: function (options)
-	    {		
+	    {
 	      $scope.timeline = {
 	      	id: 			$scope.timeline.id,
 	      	main: 		$scope.timeline.main,
@@ -180,54 +160,24 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 	      $rootScope.statusBar.display($rootScope.ui.planboard.refreshTimeline);
 
-	      if ($scope.timeline.main)
-	      {
-		      Slots.all({
-		        groupId:  $scope.timeline.current.group,
-		        division: $scope.timeline.current.division,
-		        layouts:  $scope.timeline.current.layouts,
-		        month:    $scope.timeline.current.month,
-		        stamps:   stamps
-		      })
-		      .then(function (data)
-		      {
-		        if (data.error)
-		        {
-		          $rootScope.notifier.error('Error with gettings timeslots.');
-		          console.warn('error ->', result);
-		        }
-		        else
-		        {
-		          $scope.data = data;
+				Cape.getSlots(
+					stamps.start, 
+					stamps.end, 
+					function (slots)
+				  {
+				  	$scope.data = {
+				    	periods: {
+				    		start: 	stamps.start,
+				    		end: 		stamps.end
+				    	},
+				    	user: slots.result
+				    };
+				  }
+				);
 
-		          _this.render(stamps);
-		        };
+		    _this.render(stamps);
 
-		        $rootScope.statusBar.off();
-		      });
-		    }
-	      else
-	      {
-	      	Profile.getSlots($scope.timeline.user.id, stamps)
-		      .then(function (data)
-		      {
-		        if (data.error)
-		        {
-		          $rootScope.notifier.error('Error with gettings timeslots.');
-		          console.warn('error ->', result);
-		        }
-		        else
-		        {
-			      	data.user 	= data.slots.data;
-
-			        $scope.data = data;
-
-			        _this.render(stamps);
-
-			        $rootScope.statusBar.off();
-		        };
-		      });
-		    };
+		    $rootScope.statusBar.off();
 	    },
 
 	    /**
@@ -562,99 +512,109 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	   */
 	  $scope.timelineOnAdd = function (form, slot)
 	  {
-	  	/**
-	  	 * Make view for new slot
-	  	 */
-	  	if (!form)
-	  	{
-		    var values = $scope.self.timeline.getItem($scope.self.timeline.getSelection()[0].row);
+	  	Cape.setSlot(	Dater.convert.absolute(slot.start.date, slot.start.time, false), 
+	  								Dater.convert.absolute(slot.end.date, slot.end.time, true), 
+	  								slot.state, 
+	  								slot.recursive,
+	  								function (results)
+	  							{
+	  								console.log('slot successfully added ->', results);
+	  							});
+
+	  	// /**
+	  	//  * Make view for new slot
+	  	//  */
+	  	// if (!form)
+	  	// {
+		  //   var values = $scope.self.timeline.getItem($scope.self.timeline.getSelection()[0].row);
 		      
-		    if ($scope.timeliner.isAdded() > 1) $scope.self.timeline.cancelAdd();
+		  //   if ($scope.timeliner.isAdded() > 1) $scope.self.timeline.cancelAdd();
 
-		    $scope.$apply(function ()
-		    {
-		    	if ($scope.timeline.main)
-		    	{
-			      $scope.resetViews();
+		  //   $scope.$apply(function ()
+		  //   {
+		  //   	if ($scope.timeline.main)
+		  //   	{
+			 //      $scope.resetViews();
 
-			      $scope.views.slot.add = true;
-		    	}
-		    	else
-		    	{
-			      $scope.forms = {
-			        add:  true,
-			        edit: false
-			      };
-			    };
+			 //      $scope.views.slot.add = true;
+		  //   	}
+		  //   	else
+		  //   	{
+			 //      $scope.forms = {
+			 //        add:  true,
+			 //        edit: false
+			 //      };
+			 //    };
 
-		      $scope.slot = {
-		        start: {
-		          date: new Date(values.start).toString($rootScope.config.formats.date),
-		          time: new Date(values.start).toString($rootScope.config.formats.time),
-		          datetime: new Date(values.start).toISOString()
-		        },
-		        end: {
-		          date: new Date(values.end).toString($rootScope.config.formats.date),
-		          time: new Date(values.end).toString($rootScope.config.formats.time),
-		          datetime: new Date(values.end).toISOString()
-		        },
-		        recursive: (values.group.match(/recursive/)) ? true : false,
-		        /**
-		         * INFO
-		         * First state is hard-coded
-		         * Maybe use the first one from array later on?
-		         */
-		        state: 'com.ask-cs.State.Available'
-		      };
-		    });
-	  	}
-	  	/**
-	  	 * Add new slot
-	  	 */
-	  	else
-	  	{
-		    var now     = Date.now().getTime(),
-		        values  = {
-		                    start:      ($rootScope.browser.mobile) ? 
-		                                  new Date(slot.start.datetime).getTime() / 1000 :
-		                                  Dater.convert.absolute(slot.start.date, slot.start.time, true),
-		                    end:        ($rootScope.browser.mobile) ? 
-		                                  new Date(slot.end.datetime).getTime() / 1000 : 
-		                                  Dater.convert.absolute(slot.end.date, slot.end.time, true),
-		                    recursive:  (slot.recursive) ? true : false,
-		                    text:       slot.state
-		                  };
+		  //     $scope.slot = {
+		  //       start: {
+		  //         date: new Date(values.start).toString($rootScope.config.formats.date),
+		  //         time: new Date(values.start).toString($rootScope.config.formats.time),
+		  //         datetime: new Date(values.start).toISOString()
+		  //       },
+		  //       end: {
+		  //         date: new Date(values.end).toString($rootScope.config.formats.date),
+		  //         time: new Date(values.end).toString($rootScope.config.formats.time),
+		  //         datetime: new Date(values.end).toISOString()
+		  //       },
+		  //       recursive: (values.group.match(/recursive/)) ? true : false,
+		  //       /**
+		  //        * INFO
+		  //        * First state is hard-coded
+		  //        * Maybe use the first one from array later on?
+		  //        */
+		  //       state: 'com.ask-cs.State.Available'
+		  //     };
+		  //   });
+	  	// }
+	  	// /**
+	  	//  * Add new slot
+	  	//  */
+	  	// else
+	  	// {
+		  //   var now     = Date.now().getTime(),
+		  //       values  = {
+		  //                   start:      ($rootScope.browser.mobile) ? 
+		  //                                 new Date(slot.start.datetime).getTime() / 1000 :
+		  //                                 Dater.convert.absolute(slot.start.date, slot.start.time, true),
+		  //                   end:        ($rootScope.browser.mobile) ? 
+		  //                                 new Date(slot.end.datetime).getTime() / 1000 : 
+		  //                                 Dater.convert.absolute(slot.end.date, slot.end.time, true),
+		  //                   recursive:  (slot.recursive) ? true : false,
+		  //                   text:       slot.state
+		  //                 };
 
-		    if (values.end * 1000 <= now && values.recursive == false)
-		    {
-		      $rootScope.notifier.error('You can not input timeslots in past.');
+		  //   if (values.end * 1000 <= now && values.recursive == false)
+		  //   {
+		  //     $rootScope.notifier.error('You can not input timeslots in past.');
 
-		      // timeliner.cancelAdd();
-		      $scope.timeliner.refresh();
-		    }
-		    else
-		    {
-		      $rootScope.statusBar.display($rootScope.ui.planboard.addTimeSlot);
+		  //     // timeliner.cancelAdd();
+		  //     $scope.timeliner.refresh();
+		  //   }
+		  //   else
+		  //   {
+		  //     $rootScope.statusBar.display($rootScope.ui.planboard.addTimeSlot);
 
-		      Slots.add(values, $scope.timeline.user.id)
-		      .then(
-		        function (result)
-		        {
-		          if (result.error)
-		          {
-		            $rootScope.notifier.error('Error with adding a new timeslot.');
-		            console.warn('error ->', result);
-		          }
-		          else
-		          {
-		            $rootScope.notifier.success($rootScope.ui.planboard.slotAdded);
-		          };
+		  //     Slots.add(values, $scope.timeline.user.id)
+		  //     .then(
+		  //       function (result)
+		  //       {
+		  //         if (result.error)
+		  //         {
+		  //           $rootScope.notifier.error('Error with adding a new timeslot.');
+		  //           console.warn('error ->', result);
+		  //         }
+		  //         else
+		  //         {
+		  //           $rootScope.notifier.success($rootScope.ui.planboard.slotAdded);
+		  //         };
 
-		          $scope.timeliner.refresh();
-		        }
-		      );
-		    };
-	  	}
+		  //         $scope.timeliner.refresh();
+		  //       }
+		  //     );
+		  //   };
+	  	// }
+	  	
 	  };
 
 

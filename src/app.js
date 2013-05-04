@@ -623,7 +623,6 @@ if ('localStorage' in window && window['localStorage'] !== null)
       { url: 'libs/bootstrap-timepicker/bootstrap-timepicker.min.js' },
       { url: 'libs/daterangepicker/1.1.0/daterangepicker.min.js' },
       { url: 'libs/sugar/1.3.7/sugar.min.js' },
-      { url: 'libs/strophe/1.0.2/strophe.js' },
       { url: 'libs/raphael/2.1.0/raphael-min.js' }
     )
     .then(function ()
@@ -853,12 +852,10 @@ angular.module('CapeClient')
   '$rootScope', '$location', '$timeout', 'Session', 'Dater', 'Storage', '$config', '$window', 'Timer', 'Cape',
   function ($rootScope, $location, $timeout, Session, Dater, Storage, $config, $window, Timer, Cape)
   {
-
     $rootScope.config = $config;
 
 
     $rootScope.connected = Cape.isConnected();
-    console.warn('connected ->', $rootScope.connected);
 
     
     /**
@@ -866,15 +863,18 @@ angular.module('CapeClient')
      */
     $rootScope.login = function (user)
     {
+      $('#login button[type=submit]')
+        .text('Login..')
+        .attr('disabled', 'disabled');
+        
       Cape.login(user.name, user.password,
         function ()
         {
           $rootScope.connected = Cape.isConnected();
-          console.warn('connected ->', $rootScope.connected);
 
           $rootScope.$apply(function ()
           {
-            $location.path('/dashboard');
+            $location.path('/planboard');
           });
         }
       );
@@ -886,6 +886,8 @@ angular.module('CapeClient')
      */
     $rootScope.logout = function ()
     {
+      $rootScope.connected = false;
+
       Cape.disconnect(
         function ()
         {
@@ -3718,54 +3720,6 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	'$rootScope', '$scope', '$q', '$window', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Cape',
 	function ($rootScope, $scope, $q, $window, $location, Slots, Dater, Storage, Sloter, Cape)
 	{
-		// var timeline 	= new links.Timeline(document.getElementById('mainTimeline'));
-
-		/**
-		 * Get slots
-		 */
-		Cape.getSlots(null, null, function (results)
-		{
-			console.log('results ->', results);
-
-			// $scope.data = {
-			// 	user: results
-			// };
-
-			// var data = [];
-
-			// angular.forEach(results.result, function (slot, index)
-			// {
-			// 	data.push({
-			// 		start: 		slot.start,
-			// 		end: 			slot.end,
-			// 		content: 	slot.value,
-			// 		group: 		'Planning'
-			// 	});
-			// });
-
-	  //   timeline.draw(data, {
-   //      width:  '100%',
-   //      height: 'auto',
-   //      editable: true,
-   //      style: 'box',
-   //      showCurrentTime: true,
-   //      showNavigation: false
-	  //   });
-		});
-
-
-
-
-
-			$scope.data = {
-				periods: angular.fromJson('{"start":1367100000000,"end":1367704800000}'),
-				user: angular.fromJson('[{"count":0,"end":1367676000,"recursive":true,"start":1367596800,"text":"com.ask-cs.State.KNRM.BeschikbaarNoord","type":"availability","wish":0},{"count":0,"end":1367445600,"recursive":false,"start":1367359200,"text":"com.ask-cs.State.Available","type":"","wish":0},{"count":0,"end":1367532000,"recursive":false,"start":1367488800,"text":"com.ask-cs.State.KNRM.SchipperVanDienst","type":"","wish":0},{"count":0,"end":1367570160,"recursive":false,"start":1367532000,"text":"com.ask-cs.State.KNRM.BeschikbaarZuid","type":"","wish":0},{"count":0,"end":1367661600,"recursive":false,"start":1367618400,"text":"com.ask-cs.State.Unavailable","type":"","wish":0}]')
-			};
-
-
-
-
-
 	  /**
 	   * Fix styles
 	   */
@@ -3826,8 +3780,10 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	  	id: 'mainTimeline',
 	  	main: true,
 	  	user: {
+
 	  		id: 	'SSTAM',
 	  		role: 1
+
 	  	},
 	    current: $scope.current,
 	    options: {
@@ -3855,6 +3811,49 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	      densities:  $rootScope.config.timeline.config.densities
 	    }
 	  };
+
+
+
+
+
+		$scope.data = {
+			periods: {
+				start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+				end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+			},
+			user: []
+		};
+
+
+
+
+
+		Cape.getSlots(
+			$scope.periods.weeks[Dater.current.week()].first.timeStamp, 
+			$scope.periods.weeks[Dater.current.week()].last.timeStamp, 
+			function (slots)
+	    {
+	      $scope.data = {
+	      	periods: {
+	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+	      	},
+	      	user: slots.result
+	      };
+	    }
+  	);
+
+
+
+
+
+		// $scope.data = {
+		// 	periods: angular.fromJson('{"start":1367100000000,"end":1367704800000}'),
+		// 	user: angular.fromJson('[{"count":0,"end":1367676000,"recursive":true,"start":1367596800,"text":"com.ask-cs.State.KNRM.BeschikbaarNoord","type":"availability","wish":0},{"count":0,"end":1367445600,"recursive":false,"start":1367359200,"text":"com.ask-cs.State.Available","type":"","wish":0},{"count":0,"end":1367532000,"recursive":false,"start":1367488800,"text":"com.ask-cs.State.KNRM.SchipperVanDienst","type":"","wish":0},{"count":0,"end":1367570160,"recursive":false,"start":1367532000,"text":"com.ask-cs.State.KNRM.BeschikbaarZuid","type":"","wish":0},{"count":0,"end":1367661600,"recursive":false,"start":1367618400,"text":"com.ask-cs.State.Unavailable","type":"","wish":0}]')
+		// };
+
+
+
 
 
 	  /**
@@ -3977,8 +3976,8 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 .controller('timeline',
 [
-	'$rootScope', '$scope', '$q', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Profile',
-	function ($rootScope, $scope, $q, $location, Slots, Dater, Storage, Sloter, Profile)
+	'$rootScope', '$scope', '$q', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Profile', 'Cape',
+	function ($rootScope, $scope, $q, $location, Slots, Dater, Storage, Sloter, Profile, Cape)
 	{
 		var range, diff;
 
@@ -3987,11 +3986,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 		 */
 		$scope.$watch(function ()
 		{
-			/**
-			 * If main timeline
-			 */
-			if ($scope.timeline && $scope.timeline.main)
-			{
+
 				range = $scope.self.timeline.getVisibleChartRange();
 				diff  = Dater.calculate.diff(range);
 
@@ -4041,22 +4036,6 @@ angular.module('CapeClient.Controllers.Timeline', [])
 				$scope.daterange =  Dater.readable.date($scope.timeline.range.start) +
 														' / ' +
 														Dater.readable.date($scope.timeline.range.end);
-			}
-			/**
-			 * User timeline
-			 */
-			else
-			{
-				if ($location.hash() == 'timeline')
-				{
-					range = $scope.self.timeline.getVisibleChartRange();
-
-					$scope.timeline.range = {
-						start:  new Date(range.start).toString(),
-						end:    new Date(range.end).toString()
-					};
-				}
-			}
 		});
 
 
@@ -4095,7 +4074,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	     * (Re-)Render timeline
 	     */
 	    render: function (options)
-	    {		
+	    {
 	      $scope.timeline = {
 	      	id: 			$scope.timeline.id,
 	      	main: 		$scope.timeline.main,
@@ -4149,54 +4128,24 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 	      $rootScope.statusBar.display($rootScope.ui.planboard.refreshTimeline);
 
-	      if ($scope.timeline.main)
-	      {
-		      Slots.all({
-		        groupId:  $scope.timeline.current.group,
-		        division: $scope.timeline.current.division,
-		        layouts:  $scope.timeline.current.layouts,
-		        month:    $scope.timeline.current.month,
-		        stamps:   stamps
-		      })
-		      .then(function (data)
-		      {
-		        if (data.error)
-		        {
-		          $rootScope.notifier.error('Error with gettings timeslots.');
-		          console.warn('error ->', result);
-		        }
-		        else
-		        {
-		          $scope.data = data;
+				Cape.getSlots(
+					stamps.start, 
+					stamps.end, 
+					function (slots)
+				  {
+				  	$scope.data = {
+				    	periods: {
+				    		start: 	stamps.start,
+				    		end: 		stamps.end
+				    	},
+				    	user: slots.result
+				    };
+				  }
+				);
 
-		          _this.render(stamps);
-		        };
+		    _this.render(stamps);
 
-		        $rootScope.statusBar.off();
-		      });
-		    }
-	      else
-	      {
-	      	Profile.getSlots($scope.timeline.user.id, stamps)
-		      .then(function (data)
-		      {
-		        if (data.error)
-		        {
-		          $rootScope.notifier.error('Error with gettings timeslots.');
-		          console.warn('error ->', result);
-		        }
-		        else
-		        {
-			      	data.user 	= data.slots.data;
-
-			        $scope.data = data;
-
-			        _this.render(stamps);
-
-			        $rootScope.statusBar.off();
-		        };
-		      });
-		    };
+		    $rootScope.statusBar.off();
 	    },
 
 	    /**
@@ -4531,99 +4480,109 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	   */
 	  $scope.timelineOnAdd = function (form, slot)
 	  {
-	  	/**
-	  	 * Make view for new slot
-	  	 */
-	  	if (!form)
-	  	{
-		    var values = $scope.self.timeline.getItem($scope.self.timeline.getSelection()[0].row);
+	  	Cape.setSlot(	Dater.convert.absolute(slot.start.date, slot.start.time, false), 
+	  								Dater.convert.absolute(slot.end.date, slot.end.time, true), 
+	  								slot.state, 
+	  								slot.recursive,
+	  								function (results)
+	  							{
+	  								console.log('slot successfully added ->', results);
+	  							});
+
+	  	// /**
+	  	//  * Make view for new slot
+	  	//  */
+	  	// if (!form)
+	  	// {
+		  //   var values = $scope.self.timeline.getItem($scope.self.timeline.getSelection()[0].row);
 		      
-		    if ($scope.timeliner.isAdded() > 1) $scope.self.timeline.cancelAdd();
+		  //   if ($scope.timeliner.isAdded() > 1) $scope.self.timeline.cancelAdd();
 
-		    $scope.$apply(function ()
-		    {
-		    	if ($scope.timeline.main)
-		    	{
-			      $scope.resetViews();
+		  //   $scope.$apply(function ()
+		  //   {
+		  //   	if ($scope.timeline.main)
+		  //   	{
+			 //      $scope.resetViews();
 
-			      $scope.views.slot.add = true;
-		    	}
-		    	else
-		    	{
-			      $scope.forms = {
-			        add:  true,
-			        edit: false
-			      };
-			    };
+			 //      $scope.views.slot.add = true;
+		  //   	}
+		  //   	else
+		  //   	{
+			 //      $scope.forms = {
+			 //        add:  true,
+			 //        edit: false
+			 //      };
+			 //    };
 
-		      $scope.slot = {
-		        start: {
-		          date: new Date(values.start).toString($rootScope.config.formats.date),
-		          time: new Date(values.start).toString($rootScope.config.formats.time),
-		          datetime: new Date(values.start).toISOString()
-		        },
-		        end: {
-		          date: new Date(values.end).toString($rootScope.config.formats.date),
-		          time: new Date(values.end).toString($rootScope.config.formats.time),
-		          datetime: new Date(values.end).toISOString()
-		        },
-		        recursive: (values.group.match(/recursive/)) ? true : false,
-		        /**
-		         * INFO
-		         * First state is hard-coded
-		         * Maybe use the first one from array later on?
-		         */
-		        state: 'com.ask-cs.State.Available'
-		      };
-		    });
-	  	}
-	  	/**
-	  	 * Add new slot
-	  	 */
-	  	else
-	  	{
-		    var now     = Date.now().getTime(),
-		        values  = {
-		                    start:      ($rootScope.browser.mobile) ? 
-		                                  new Date(slot.start.datetime).getTime() / 1000 :
-		                                  Dater.convert.absolute(slot.start.date, slot.start.time, true),
-		                    end:        ($rootScope.browser.mobile) ? 
-		                                  new Date(slot.end.datetime).getTime() / 1000 : 
-		                                  Dater.convert.absolute(slot.end.date, slot.end.time, true),
-		                    recursive:  (slot.recursive) ? true : false,
-		                    text:       slot.state
-		                  };
+		  //     $scope.slot = {
+		  //       start: {
+		  //         date: new Date(values.start).toString($rootScope.config.formats.date),
+		  //         time: new Date(values.start).toString($rootScope.config.formats.time),
+		  //         datetime: new Date(values.start).toISOString()
+		  //       },
+		  //       end: {
+		  //         date: new Date(values.end).toString($rootScope.config.formats.date),
+		  //         time: new Date(values.end).toString($rootScope.config.formats.time),
+		  //         datetime: new Date(values.end).toISOString()
+		  //       },
+		  //       recursive: (values.group.match(/recursive/)) ? true : false,
+		  //       /**
+		  //        * INFO
+		  //        * First state is hard-coded
+		  //        * Maybe use the first one from array later on?
+		  //        */
+		  //       state: 'com.ask-cs.State.Available'
+		  //     };
+		  //   });
+	  	// }
+	  	// /**
+	  	//  * Add new slot
+	  	//  */
+	  	// else
+	  	// {
+		  //   var now     = Date.now().getTime(),
+		  //       values  = {
+		  //                   start:      ($rootScope.browser.mobile) ? 
+		  //                                 new Date(slot.start.datetime).getTime() / 1000 :
+		  //                                 Dater.convert.absolute(slot.start.date, slot.start.time, true),
+		  //                   end:        ($rootScope.browser.mobile) ? 
+		  //                                 new Date(slot.end.datetime).getTime() / 1000 : 
+		  //                                 Dater.convert.absolute(slot.end.date, slot.end.time, true),
+		  //                   recursive:  (slot.recursive) ? true : false,
+		  //                   text:       slot.state
+		  //                 };
 
-		    if (values.end * 1000 <= now && values.recursive == false)
-		    {
-		      $rootScope.notifier.error('You can not input timeslots in past.');
+		  //   if (values.end * 1000 <= now && values.recursive == false)
+		  //   {
+		  //     $rootScope.notifier.error('You can not input timeslots in past.');
 
-		      // timeliner.cancelAdd();
-		      $scope.timeliner.refresh();
-		    }
-		    else
-		    {
-		      $rootScope.statusBar.display($rootScope.ui.planboard.addTimeSlot);
+		  //     // timeliner.cancelAdd();
+		  //     $scope.timeliner.refresh();
+		  //   }
+		  //   else
+		  //   {
+		  //     $rootScope.statusBar.display($rootScope.ui.planboard.addTimeSlot);
 
-		      Slots.add(values, $scope.timeline.user.id)
-		      .then(
-		        function (result)
-		        {
-		          if (result.error)
-		          {
-		            $rootScope.notifier.error('Error with adding a new timeslot.');
-		            console.warn('error ->', result);
-		          }
-		          else
-		          {
-		            $rootScope.notifier.success($rootScope.ui.planboard.slotAdded);
-		          };
+		  //     Slots.add(values, $scope.timeline.user.id)
+		  //     .then(
+		  //       function (result)
+		  //       {
+		  //         if (result.error)
+		  //         {
+		  //           $rootScope.notifier.error('Error with adding a new timeslot.');
+		  //           console.warn('error ->', result);
+		  //         }
+		  //         else
+		  //         {
+		  //           $rootScope.notifier.success($rootScope.ui.planboard.slotAdded);
+		  //         };
 
-		          $scope.timeliner.refresh();
-		        }
-		      );
-		    };
-	  	}
+		  //         $scope.timeliner.refresh();
+		  //       }
+		  //     );
+		  //   };
+	  	// }
+	  	
 	  };
 
 
@@ -4905,7 +4864,7 @@ angular.module('CapeClient.Controllers.Timeline.Navigation', [])
 	      /**
 	       * Total days in a month can change so get it start periods cache
 	       */
-	      if ($scope.timeline.current.day != periods.days.total)
+	      if ($scope.timeline.current.day != $scope.periods.days.total)
 	      {
 	        $scope.timeline.current.day++;
 
@@ -5156,6 +5115,7 @@ angular.module('CapeClient.Modals.Cape', [])
         var reply = $msg({to: url, from: this.username, type: 'chat'})
                 .c("body")
                 .t( json );
+
         console.log('Sending: ',json);
 
         this.connection.send(reply.tree());
@@ -5215,9 +5175,6 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.connected = function (callback)
       {
-
-        console.warn('connection -> ', this.connection, 'stateAgentUrl ->', this.stateAgentUrl);
-        
         localStorage['capeclient_sid'] = this.connection.sid;
         localStorage['capeclient_rid'] = this.connection.rid;
         localStorage['capeclient_jid'] = this.connection.jid;
@@ -5229,31 +5186,27 @@ angular.module('CapeClient.Modals.Cape', [])
 
         var thiz = this;
 
-        if (this.stateAgentUrl == null)
+        if (this.stateAgentUrl == undefined)
         {
           this.findDatasource(this.userid, "state", function (result)
           {
             thiz.stateAgentUrl = result.result[0].agentUrl.replace('xmpp:', '');
 
             localStorage['capeclient_sa'] = thiz.stateAgentUrl;
-            
-            console.log('state agent is null ->', thiz.stateAgentUrl);
 
-            if(callback != null)
+            if(callback !== null)
               callback();
           });
         }
         else
         {
-          if(callback != null)
+          if(callback !== null)
               callback();
         }
 
         function onMessage (msg)
         {
-          console.log('coming to onMessage');
-
-          console.log('---> Receiving: ', msg);
+          console.log('Receiving: ',msg);
 
           var to      = msg.getAttribute('to'),
               from    = msg.getAttribute('from'),
@@ -5266,14 +5219,17 @@ angular.module('CapeClient.Modals.Cape', [])
             var body = elems[0],
                 json = JSON.parse(Strophe.getText(body));
 
+            console.warn('Result ->', json);
+
             if (json.result !== null)
             {
               var callb = thiz.requests[json.id];
-              
-              console.log('Callb: ' + callback + ' reqid: ' + json.id);
-              
+
+              // console.log('this requests ===>', thiz.requests);
+
+              //console.log('Callb: '+callb+' reqid: '+json.id);
               if(callb!==null) {
-                console.log('Starting callback');
+                // console.log('Starting callback');
                 callb(json);
                 thiz.requests.splice(json.id, 1);
               }
@@ -5327,7 +5283,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.findDatasource = function (agentid, type, callback)
       {
-        console.log('finding datasource', arguments);
+        // console.log('lets look for the data source', callback);
 
         var merlin      = "merlin@openid.ask-cs.com/merlin",
             params      = {};
@@ -5395,8 +5351,8 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.call = function (agentUrl, method, params, callback)
       {
-        console.log('coming to call ->', arguments);
-        
+        // console.warn('call function !!', arguments);
+
         this.requestid++;
 
         var rpc = new JSONRPC(this.connection);
@@ -5404,6 +5360,8 @@ angular.module('CapeClient.Modals.Cape', [])
         rpc.send(this.requestid, agentUrl, method, params);
 
         this.requests[this.requestid] = callback;
+
+        // console.log('stacked request =====>', this.requests[this.requestid]);
       };
 
 

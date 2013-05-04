@@ -55,7 +55,6 @@ if ('localStorage' in window && window['localStorage'] !== null)
       { url: 'libs/bootstrap-timepicker/bootstrap-timepicker.min.js' },
       { url: 'libs/daterangepicker/1.1.0/daterangepicker.min.js' },
       { url: 'libs/sugar/1.3.7/sugar.min.js' },
-      { url: 'libs/strophe/1.0.2/strophe.js' },
       { url: 'libs/raphael/2.1.0/raphael-min.js' }
     )
     .then(function ()

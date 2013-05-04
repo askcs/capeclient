@@ -107,6 +107,7 @@ angular.module('CapeClient.Modals.Cape', [])
         var reply = $msg({to: url, from: this.username, type: 'chat'})
                 .c("body")
                 .t( json );
+
         console.log('Sending: ',json);
 
         this.connection.send(reply.tree());
@@ -166,9 +167,6 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.connected = function (callback)
       {
-
-        console.warn('connection -> ', this.connection, 'stateAgentUrl ->', this.stateAgentUrl);
-        
         localStorage['capeclient_sid'] = this.connection.sid;
         localStorage['capeclient_rid'] = this.connection.rid;
         localStorage['capeclient_jid'] = this.connection.jid;
@@ -180,31 +178,27 @@ angular.module('CapeClient.Modals.Cape', [])
 
         var thiz = this;
 
-        if (this.stateAgentUrl == null)
+        if (this.stateAgentUrl == undefined)
         {
           this.findDatasource(this.userid, "state", function (result)
           {
             thiz.stateAgentUrl = result.result[0].agentUrl.replace('xmpp:', '');
 
             localStorage['capeclient_sa'] = thiz.stateAgentUrl;
-            
-            console.log('state agent is null ->', thiz.stateAgentUrl);
 
-            if(callback != null)
+            if(callback !== null)
               callback();
           });
         }
         else
         {
-          if(callback != null)
+          if(callback !== null)
               callback();
         }
 
         function onMessage (msg)
         {
-          console.log('coming to onMessage');
-
-          console.log('---> Receiving: ', msg);
+          console.log('Receiving: ',msg);
 
           var to      = msg.getAttribute('to'),
               from    = msg.getAttribute('from'),
@@ -217,14 +211,17 @@ angular.module('CapeClient.Modals.Cape', [])
             var body = elems[0],
                 json = JSON.parse(Strophe.getText(body));
 
+            console.warn('Result ->', json);
+
             if (json.result !== null)
             {
               var callb = thiz.requests[json.id];
-              
-              console.log('Callb: ' + callback + ' reqid: ' + json.id);
-              
+
+              // console.log('this requests ===>', thiz.requests);
+
+              //console.log('Callb: '+callb+' reqid: '+json.id);
               if(callb!==null) {
-                console.log('Starting callback');
+                // console.log('Starting callback');
                 callb(json);
                 thiz.requests.splice(json.id, 1);
               }
@@ -278,7 +275,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.findDatasource = function (agentid, type, callback)
       {
-        console.log('finding datasource', arguments);
+        // console.log('lets look for the data source', callback);
 
         var merlin      = "merlin@openid.ask-cs.com/merlin",
             params      = {};
@@ -346,8 +343,8 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.call = function (agentUrl, method, params, callback)
       {
-        console.log('coming to call ->', arguments);
-        
+        // console.warn('call function !!', arguments);
+
         this.requestid++;
 
         var rpc = new JSONRPC(this.connection);
@@ -355,6 +352,8 @@ angular.module('CapeClient.Modals.Cape', [])
         rpc.send(this.requestid, agentUrl, method, params);
 
         this.requests[this.requestid] = callback;
+
+        // console.log('stacked request =====>', this.requests[this.requestid]);
       };
 
 

@@ -14,54 +14,6 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	'$rootScope', '$scope', '$q', '$window', '$location', 'Slots', 'Dater', 'Storage', 'Sloter', 'Cape',
 	function ($rootScope, $scope, $q, $window, $location, Slots, Dater, Storage, Sloter, Cape)
 	{
-		// var timeline 	= new links.Timeline(document.getElementById('mainTimeline'));
-
-		/**
-		 * Get slots
-		 */
-		Cape.getSlots(null, null, function (results)
-		{
-			console.log('results ->', results);
-
-			// $scope.data = {
-			// 	user: results
-			// };
-
-			// var data = [];
-
-			// angular.forEach(results.result, function (slot, index)
-			// {
-			// 	data.push({
-			// 		start: 		slot.start,
-			// 		end: 			slot.end,
-			// 		content: 	slot.value,
-			// 		group: 		'Planning'
-			// 	});
-			// });
-
-	  //   timeline.draw(data, {
-   //      width:  '100%',
-   //      height: 'auto',
-   //      editable: true,
-   //      style: 'box',
-   //      showCurrentTime: true,
-   //      showNavigation: false
-	  //   });
-		});
-
-
-
-
-
-			$scope.data = {
-				periods: angular.fromJson('{"start":1367100000000,"end":1367704800000}'),
-				user: angular.fromJson('[{"count":0,"end":1367676000,"recursive":true,"start":1367596800,"text":"com.ask-cs.State.KNRM.BeschikbaarNoord","type":"availability","wish":0},{"count":0,"end":1367445600,"recursive":false,"start":1367359200,"text":"com.ask-cs.State.Available","type":"","wish":0},{"count":0,"end":1367532000,"recursive":false,"start":1367488800,"text":"com.ask-cs.State.KNRM.SchipperVanDienst","type":"","wish":0},{"count":0,"end":1367570160,"recursive":false,"start":1367532000,"text":"com.ask-cs.State.KNRM.BeschikbaarZuid","type":"","wish":0},{"count":0,"end":1367661600,"recursive":false,"start":1367618400,"text":"com.ask-cs.State.Unavailable","type":"","wish":0}]')
-			};
-
-
-
-
-
 	  /**
 	   * Fix styles
 	   */
@@ -122,8 +74,10 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	  	id: 'mainTimeline',
 	  	main: true,
 	  	user: {
+
 	  		id: 	'SSTAM',
 	  		role: 1
+
 	  	},
 	    current: $scope.current,
 	    options: {
@@ -151,6 +105,49 @@ angular.module('CapeClient.Controllers.Planboard', [])
 	      densities:  $rootScope.config.timeline.config.densities
 	    }
 	  };
+
+
+
+
+
+		$scope.data = {
+			periods: {
+				start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+				end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+			},
+			user: []
+		};
+
+
+
+
+
+		Cape.getSlots(
+			$scope.periods.weeks[Dater.current.week()].first.timeStamp, 
+			$scope.periods.weeks[Dater.current.week()].last.timeStamp, 
+			function (slots)
+	    {
+	      $scope.data = {
+	      	periods: {
+	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+	      	},
+	      	user: slots.result
+	      };
+	    }
+  	);
+
+
+
+
+
+		// $scope.data = {
+		// 	periods: angular.fromJson('{"start":1367100000000,"end":1367704800000}'),
+		// 	user: angular.fromJson('[{"count":0,"end":1367676000,"recursive":true,"start":1367596800,"text":"com.ask-cs.State.KNRM.BeschikbaarNoord","type":"availability","wish":0},{"count":0,"end":1367445600,"recursive":false,"start":1367359200,"text":"com.ask-cs.State.Available","type":"","wish":0},{"count":0,"end":1367532000,"recursive":false,"start":1367488800,"text":"com.ask-cs.State.KNRM.SchipperVanDienst","type":"","wish":0},{"count":0,"end":1367570160,"recursive":false,"start":1367532000,"text":"com.ask-cs.State.KNRM.BeschikbaarZuid","type":"","wish":0},{"count":0,"end":1367661600,"recursive":false,"start":1367618400,"text":"com.ask-cs.State.Unavailable","type":"","wish":0}]')
+		// };
+
+
+
 
 
 	  /**

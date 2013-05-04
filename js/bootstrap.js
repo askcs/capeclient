@@ -13,12 +13,10 @@ angular.module('CapeClient')
   '$rootScope', '$location', '$timeout', 'Session', 'Dater', 'Storage', '$config', '$window', 'Timer', 'Cape',
   function ($rootScope, $location, $timeout, Session, Dater, Storage, $config, $window, Timer, Cape)
   {
-
     $rootScope.config = $config;
 
 
     $rootScope.connected = Cape.isConnected();
-    console.warn('connected ->', $rootScope.connected);
 
     
     /**
@@ -26,15 +24,18 @@ angular.module('CapeClient')
      */
     $rootScope.login = function (user)
     {
+      $('#login button[type=submit]')
+        .text('Login..')
+        .attr('disabled', 'disabled');
+        
       Cape.login(user.name, user.password,
         function ()
         {
           $rootScope.connected = Cape.isConnected();
-          console.warn('connected ->', $rootScope.connected);
 
           $rootScope.$apply(function ()
           {
-            $location.path('/dashboard');
+            $location.path('/planboard');
           });
         }
       );
@@ -46,6 +47,8 @@ angular.module('CapeClient')
      */
     $rootScope.logout = function ()
     {
+      $rootScope.connected = false;
+
       Cape.disconnect(
         function ()
         {
