@@ -7,15 +7,37 @@
  * Declare app level module which depends on filters, and services
  */
 angular.module('CapeClient',[
+  'ngResource',
   // modals
   'CapeClient.Modals.Cape',
+  'CapeClient.Modals.User',
+  'CapeClient.Modals.Dashboard',
+  'CapeClient.Modals.Slots',
+  'CapeClient.Modals.Messages',
+  'CapeClient.Modals.Groups',
+  'CapeClient.Modals.Profile',
+  'CapeClient.Modals.Settings',
   // controller
   'CapeClient.Controllers.Login',
   'CapeClient.Controllers.Dashboard',
+  'CapeClient.Controllers.Timeline',
+  'CapeClient.Controllers.Timeline.Navigation',
   // services
+  'CapeClient.Services.Timer',
+  'CapeClient.Services.Session',
+  'CapeClient.Services.Dater',
+  'CapeClient.Services.EventBus',
+  'CapeClient.Services.Interceptor',
+  'CapeClient.Services.MD5',
+  'CapeClient.Services.Storage',
+  'CapeClient.Services.Strings',
+  'CapeClient.Services.Announcer',
+  'CapeClient.Services.Sloter',
+  'CapeClient.Services.Stats',
   // directives
-  '$strap.directives'
+  '$strap.directives',
   // filters
+  'CapeClient.Filters'
 ]);
 
 
