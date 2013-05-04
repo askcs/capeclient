@@ -337,12 +337,12 @@ angular.module('CapeClient.Services.Storage', ['ngResource'])
   };
 
 
-  var getSettings = function ()
-  {
-    var settings = angular.fromJson(getFromLocalStorage('resources'));
+  // var getSettings = function ()
+  // {
+  //   var settings = angular.fromJson(getFromLocalStorage('resources'));
 
-    return (!settings.settingsWebPaige) ? $rootScope.config.defaults.settingsWebPaige : angular.fromJson(settings.settingsWebPaige);
-  };
+  //   return (!settings.settingsWebPaige) ? $rootScope.config.defaults.settingsWebPaige : angular.fromJson(settings.settingsWebPaige);
+  // };
 
 
   return {
@@ -367,8 +367,8 @@ angular.module('CapeClient.Services.Storage', ['ngResource'])
     local: {
       periods:  getPeriods,
       groups:   getGroups,
-      members:  getMembers,
-      settings: getSettings
+      members:  getMembers
+      // settings: getSettings
     }
   }
 

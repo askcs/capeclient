@@ -284,7 +284,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.getSlots = function (start, end, callback)
       {
-        if (this.stateAgentUrl === null)
+        if (this.stateAgentUrl == null)
           throw "No stateAgent found";
 
         if (start === null)

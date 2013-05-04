@@ -192,7 +192,7 @@ if ('localStorage' in window && window['localStorage'] !== null)
     };
 
     var head = document.head || document.getElementsByTagName('head')[0];
-    var storagePrefix = 'WebPaige.';
+    var storagePrefix = 'CapeClient.';
     var defaultExpiration = 5000;
 
     var addLocalStorage = function( key, storeObj ) {
