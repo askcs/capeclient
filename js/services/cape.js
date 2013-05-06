@@ -198,7 +198,7 @@ angular.module('CapeClient.Modals.Cape', [])
 
         function onMessage (msg)
         {
-          console.log('Receiving: ',msg);
+          //console.log('Receiving: ',msg);
 
           var to      = msg.getAttribute('to'),
               from    = msg.getAttribute('from'),
@@ -263,6 +263,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.disconnected = function ()
       {
+        console.log('Disconnected!');
         localStorage.removeItem('capeclient_sid');
         localStorage.removeItem('capeclient_rid');
         localStorage.removeItem('capeclient_jid');
@@ -305,6 +306,8 @@ angular.module('CapeClient.Modals.Cape', [])
         params.start_millis = start;
         params.end_millis   = end;
 
+        //console.log(this.stateAgentUrl, "getSlotsCombined", params, callback);
+
         this.call(this.stateAgentUrl, "getSlotsCombined", params, callback);
       };
 
@@ -323,7 +326,7 @@ angular.module('CapeClient.Modals.Cape', [])
         params.start_millis = start;
         params.end_millis   = end;
         params.description  = text;
-        params.occurence    = occurence;
+        params.occurence    = (occurence) ? 'WEEKLY' : 'ONCE';
 
         this.call(this.stateAgentUrl, "setSlot", params, callback);
       };

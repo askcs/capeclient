@@ -124,29 +124,18 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 	      angular.extend($scope.timeline.options, $rootScope.config.timeline.options);
 
-	      if ($scope.timeline.main)
-	      {
-		      $scope.self.timeline.draw(
-		        Sloter.process(
-		          $scope.data,
-		          $scope.timeline.config,
-		          $scope.divisions,
-		          $scope.timeline.user.role
-		        ), 
-		        $scope.timeline.options
-		      );
-		    }
-		    else
-		    {
-			    setTimeout( function() 
-		      {
-		        $scope.self.timeline.draw(
-		          Sloter.profile(
-		            $scope.data.slots.data, 
-		            $scope.timeline.config
-		          ), $scope.timeline.options);
-		      }, 100);
-		    };
+	      console.warn('inside in processer ->', angular.fromJson(Storage.get('data')));
+
+	      $scope.self.timeline.draw(
+	        Sloter.process(
+	        	// angular.fromJson(Storage.get('data')),
+	          $scope.data,
+	          $scope.timeline.config,
+	          $scope.divisions,
+	          $scope.timeline.user.role
+	        ), 
+	        $scope.timeline.options
+	      );
 
 	      $scope.self.timeline.setVisibleChartRange($scope.timeline.options.start, $scope.timeline.options.end);
 	    },
@@ -165,13 +154,44 @@ angular.module('CapeClient.Controllers.Timeline', [])
 					stamps.end, 
 					function (slots)
 				  {
-				  	$scope.data = {
-				    	periods: {
-				    		start: 	stamps.start,
-				    		end: 		stamps.end
-				    	},
-				    	user: slots.result
-				    };
+
+						var timedata = [];
+
+			    	angular.forEach(slots.result, function (slot, index)
+			    	{
+			    		console.log('slot ->', slot);
+			    		timedata.push({
+			    			start: 	slot.start,
+			    			end: 		slot.end,
+			    			text: 	(angular.fromJson(slot.value)).event,
+			    			type: 	'availability',
+			    			recursive: false
+			    		});
+
+			    	});
+
+			    	console.log('timedata ->', timedata);
+
+			      $scope.data = {
+			      	periods: {
+			      		start: 	stamps.start,
+			      		end: 		stamps.end
+			      	},
+			      	user: timedata
+			      };
+
+
+
+    				Storage.add('data', angular.toJson($scope.data));
+
+
+				  	// $scope.data = {
+				   //  	periods: {
+				   //  		start: 	stamps.start,
+				   //  		end: 		stamps.end
+				   //  	},
+				   //  	user: slots.result
+				   //  };
 				  }
 				);
 
@@ -513,7 +533,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	  $scope.timelineOnAdd = function (form, slot)
 	  {
 	  	Cape.setSlot(	Dater.convert.absolute(slot.start.date, slot.start.time, false), 
-	  								Dater.convert.absolute(slot.end.date, slot.end.time, true), 
+	  								Dater.convert.absolute(slot.end.date, slot.end.time, false), 
 	  								slot.state, 
 	  								slot.recursive,
 	  								function (results)

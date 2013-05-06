@@ -37,7 +37,7 @@ angular.module('CapeClient')
      * Router fallback
      */
     .otherwise({
-      redirectTo: '/planboard'
+      redirectTo: '/login'
     });
   }
 ]);

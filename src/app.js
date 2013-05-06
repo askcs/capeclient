@@ -834,7 +834,7 @@ angular.module('CapeClient')
      * Router fallback
      */
     .otherwise({
-      redirectTo: '/planboard'
+      redirectTo: '/login'
     });
   }
 ]);;/*jslint node: true */
@@ -3816,31 +3816,62 @@ angular.module('CapeClient.Controllers.Planboard', [])
 
 
 
-		$scope.data = {
-			periods: {
-				start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
-				end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
-			},
-			user: []
-		};
+		// $scope.data = {
+		// 	periods: {
+		// 		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+		// 		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+		// 	},
+		// 	user: []
+		// };
 
 
+		function renderTimeline (slots)
+		{
+
+			var timedata = [];
+
+    	angular.forEach(slots.result, function (slot, index)
+    	{
+    		// console.log('slot ->', slot);
+    		timedata.push({
+    			start: 	slot.start / 1000,
+    			end: 		slot.end / 1000,
+    			text: 	(angular.fromJson(slot.value)).event,
+    			type: 	'availability',
+    			recursive: false
+    		});
+
+    	});
+
+    	// console.log('timedata ->', timedata);
+
+    	$scope.$apply(function ()
+    	{
+	      $scope.data = {
+	      	periods: {
+	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+	      	},
+	      	user: timedata
+	      };
+    	});
+
+    	Storage.add('data', angular.toJson($scope.data));
+
+    	console.log('scope data ->', angular.toJson($scope.data));
+		}
 
 
 
 		Cape.getSlots(
 			$scope.periods.weeks[Dater.current.week()].first.timeStamp, 
 			$scope.periods.weeks[Dater.current.week()].last.timeStamp, 
+
 			function (slots)
 	    {
-	      $scope.data = {
-	      	periods: {
-	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
-	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
-	      	},
-	      	user: slots.result
-	      };
+	    	renderTimeline(slots);
 	    }
+
   	);
 
 
@@ -4092,29 +4123,18 @@ angular.module('CapeClient.Controllers.Timeline', [])
 
 	      angular.extend($scope.timeline.options, $rootScope.config.timeline.options);
 
-	      if ($scope.timeline.main)
-	      {
-		      $scope.self.timeline.draw(
-		        Sloter.process(
-		          $scope.data,
-		          $scope.timeline.config,
-		          $scope.divisions,
-		          $scope.timeline.user.role
-		        ), 
-		        $scope.timeline.options
-		      );
-		    }
-		    else
-		    {
-			    setTimeout( function() 
-		      {
-		        $scope.self.timeline.draw(
-		          Sloter.profile(
-		            $scope.data.slots.data, 
-		            $scope.timeline.config
-		          ), $scope.timeline.options);
-		      }, 100);
-		    };
+	      console.warn('inside in processer ->', angular.fromJson(Storage.get('data')));
+
+	      $scope.self.timeline.draw(
+	        Sloter.process(
+	        	// angular.fromJson(Storage.get('data')),
+	          $scope.data,
+	          $scope.timeline.config,
+	          $scope.divisions,
+	          $scope.timeline.user.role
+	        ), 
+	        $scope.timeline.options
+	      );
 
 	      $scope.self.timeline.setVisibleChartRange($scope.timeline.options.start, $scope.timeline.options.end);
 	    },
@@ -4133,13 +4153,44 @@ angular.module('CapeClient.Controllers.Timeline', [])
 					stamps.end, 
 					function (slots)
 				  {
-				  	$scope.data = {
-				    	periods: {
-				    		start: 	stamps.start,
-				    		end: 		stamps.end
-				    	},
-				    	user: slots.result
-				    };
+
+						var timedata = [];
+
+			    	angular.forEach(slots.result, function (slot, index)
+			    	{
+			    		console.log('slot ->', slot);
+			    		timedata.push({
+			    			start: 	slot.start,
+			    			end: 		slot.end,
+			    			text: 	(angular.fromJson(slot.value)).event,
+			    			type: 	'availability',
+			    			recursive: false
+			    		});
+
+			    	});
+
+			    	console.log('timedata ->', timedata);
+
+			      $scope.data = {
+			      	periods: {
+			      		start: 	stamps.start,
+			      		end: 		stamps.end
+			      	},
+			      	user: timedata
+			      };
+
+
+
+    				Storage.add('data', angular.toJson($scope.data));
+
+
+				  	// $scope.data = {
+				   //  	periods: {
+				   //  		start: 	stamps.start,
+				   //  		end: 		stamps.end
+				   //  	},
+				   //  	user: slots.result
+				   //  };
 				  }
 				);
 
@@ -4481,7 +4532,7 @@ angular.module('CapeClient.Controllers.Timeline', [])
 	  $scope.timelineOnAdd = function (form, slot)
 	  {
 	  	Cape.setSlot(	Dater.convert.absolute(slot.start.date, slot.start.time, false), 
-	  								Dater.convert.absolute(slot.end.date, slot.end.time, true), 
+	  								Dater.convert.absolute(slot.end.date, slot.end.time, false), 
 	  								slot.state, 
 	  								slot.recursive,
 	  								function (results)
@@ -5206,7 +5257,7 @@ angular.module('CapeClient.Modals.Cape', [])
 
         function onMessage (msg)
         {
-          console.log('Receiving: ',msg);
+          //console.log('Receiving: ',msg);
 
           var to      = msg.getAttribute('to'),
               from    = msg.getAttribute('from'),
@@ -5271,6 +5322,7 @@ angular.module('CapeClient.Modals.Cape', [])
        */
       CapeClient.prototype.disconnected = function ()
       {
+        console.log('Disconnected!');
         localStorage.removeItem('capeclient_sid');
         localStorage.removeItem('capeclient_rid');
         localStorage.removeItem('capeclient_jid');
@@ -5313,6 +5365,8 @@ angular.module('CapeClient.Modals.Cape', [])
         params.start_millis = start;
         params.end_millis   = end;
 
+        //console.log(this.stateAgentUrl, "getSlotsCombined", params, callback);
+
         this.call(this.stateAgentUrl, "getSlotsCombined", params, callback);
       };
 
@@ -5331,7 +5385,7 @@ angular.module('CapeClient.Modals.Cape', [])
         params.start_millis = start;
         params.end_millis   = end;
         params.description  = text;
-        params.occurence    = occurence;
+        params.occurence    = (occurence) ? 'WEEKLY' : 'ONCE';
 
         this.call(this.stateAgentUrl, "setSlot", params, callback);
       };
@@ -6707,7 +6761,13 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
       {
         var _this = this;
 
-        angular.forEach(data.user, function (slot, index)
+        // console.log('========> data ->', data, 'timedata ->', timedata, 'config ->', config);
+        
+        var userdata = angular.fromJson(Storage.get('data')).user;
+
+        console.log('====> userdata ->', userdata);
+
+        angular.forEach(userdata, function (slot, index)
         {
           angular.forEach(config.legenda, function (value, legenda)
           {
@@ -6731,10 +6791,10 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
           });       
         });
 
-        timedata = _this.addLoading(data, timedata, [
-          _this.wrapper('b') + $rootScope.ui.planboard.weeklyPlanning + _this.wrapper('recursive'),
-          _this.wrapper('a') + $rootScope.ui.planboard.planning + _this.wrapper('planning')
-        ]);
+        // timedata = _this.addLoading(data, timedata, [
+        //   _this.wrapper('b') + $rootScope.ui.planboard.weeklyPlanning + _this.wrapper('recursive'),
+        //   _this.wrapper('a') + $rootScope.ui.planboard.planning + _this.wrapper('planning')
+        // ]);
 
         return timedata;
       },
@@ -7163,27 +7223,28 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
         var _this     = this,
             timedata  = [];
 
-        if (data.user) timedata = _this.user(data, timedata, config);
+        // if (data.user) timedata = _this.user(data, timedata, config);
+        timedata = _this.user(data, timedata, config);
 
-        if (data.aggs)
-        {
-          var name = _this.namer(data, divisions, privilage);
+        // if (data.aggs)
+        // {
+        //   var name = _this.namer(data, divisions, privilage);
 
-          if (config.bar) 
-          {
-            timedata = _this.bars(data, timedata, config, name);
-          }
-          else
-          {
-            timedata = _this.aggs(data, timedata, config, name);
-          };
-        };
+        //   if (config.bar) 
+        //   {
+        //     timedata = _this.bars(data, timedata, config, name);
+        //   }
+        //   else
+        //   {
+        //     timedata = _this.aggs(data, timedata, config, name);
+        //   };
+        // };
 
-        if (config.wishes) timedata = _this.wishes(data, timedata, name);
+        // if (config.wishes) timedata = _this.wishes(data, timedata, name);
 
-        if (data.members) timedata = _this.members(data, timedata, config, privilage);
+        // if (data.members) timedata = _this.members(data, timedata, config, privilage);
 
-        if (data.aggs && data.aggs.ratios) _this.pies(data);
+        // if (data.aggs && data.aggs.ratios) _this.pies(data);
 
         return timedata;
       }

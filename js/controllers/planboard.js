@@ -110,31 +110,62 @@ angular.module('CapeClient.Controllers.Planboard', [])
 
 
 
-		$scope.data = {
-			periods: {
-				start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
-				end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
-			},
-			user: []
-		};
+		// $scope.data = {
+		// 	periods: {
+		// 		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+		// 		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+		// 	},
+		// 	user: []
+		// };
 
 
+		function renderTimeline (slots)
+		{
+
+			var timedata = [];
+
+    	angular.forEach(slots.result, function (slot, index)
+    	{
+    		// console.log('slot ->', slot);
+    		timedata.push({
+    			start: 	slot.start / 1000,
+    			end: 		slot.end / 1000,
+    			text: 	(angular.fromJson(slot.value)).event,
+    			type: 	'availability',
+    			recursive: false
+    		});
+
+    	});
+
+    	// console.log('timedata ->', timedata);
+
+    	$scope.$apply(function ()
+    	{
+	      $scope.data = {
+	      	periods: {
+	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
+	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
+	      	},
+	      	user: timedata
+	      };
+    	});
+
+    	Storage.add('data', angular.toJson($scope.data));
+
+    	console.log('scope data ->', angular.toJson($scope.data));
+		}
 
 
 
 		Cape.getSlots(
 			$scope.periods.weeks[Dater.current.week()].first.timeStamp, 
 			$scope.periods.weeks[Dater.current.week()].last.timeStamp, 
+
 			function (slots)
 	    {
-	      $scope.data = {
-	      	periods: {
-	      		start: 	$scope.periods.weeks[Dater.current.week()].first.timeStamp,
-	      		end: 		$scope.periods.weeks[Dater.current.week()].last.timeStamp
-	      	},
-	      	user: slots.result
-	      };
+	    	renderTimeline(slots);
 	    }
+
   	);
 
 

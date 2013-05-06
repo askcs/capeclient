@@ -89,7 +89,13 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
       {
         var _this = this;
 
-        angular.forEach(data.user, function (slot, index)
+        // console.log('========> data ->', data, 'timedata ->', timedata, 'config ->', config);
+        
+        var userdata = angular.fromJson(Storage.get('data')).user;
+
+        console.log('====> userdata ->', userdata);
+
+        angular.forEach(userdata, function (slot, index)
         {
           angular.forEach(config.legenda, function (value, legenda)
           {
@@ -113,10 +119,10 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
           });       
         });
 
-        timedata = _this.addLoading(data, timedata, [
-          _this.wrapper('b') + $rootScope.ui.planboard.weeklyPlanning + _this.wrapper('recursive'),
-          _this.wrapper('a') + $rootScope.ui.planboard.planning + _this.wrapper('planning')
-        ]);
+        // timedata = _this.addLoading(data, timedata, [
+        //   _this.wrapper('b') + $rootScope.ui.planboard.weeklyPlanning + _this.wrapper('recursive'),
+        //   _this.wrapper('a') + $rootScope.ui.planboard.planning + _this.wrapper('planning')
+        // ]);
 
         return timedata;
       },
@@ -545,27 +551,28 @@ angular.module('CapeClient.Services.Sloter', ['ngResource'])
         var _this     = this,
             timedata  = [];
 
-        if (data.user) timedata = _this.user(data, timedata, config);
+        // if (data.user) timedata = _this.user(data, timedata, config);
+        timedata = _this.user(data, timedata, config);
 
-        if (data.aggs)
-        {
-          var name = _this.namer(data, divisions, privilage);
+        // if (data.aggs)
+        // {
+        //   var name = _this.namer(data, divisions, privilage);
 
-          if (config.bar) 
-          {
-            timedata = _this.bars(data, timedata, config, name);
-          }
-          else
-          {
-            timedata = _this.aggs(data, timedata, config, name);
-          };
-        };
+        //   if (config.bar) 
+        //   {
+        //     timedata = _this.bars(data, timedata, config, name);
+        //   }
+        //   else
+        //   {
+        //     timedata = _this.aggs(data, timedata, config, name);
+        //   };
+        // };
 
-        if (config.wishes) timedata = _this.wishes(data, timedata, name);
+        // if (config.wishes) timedata = _this.wishes(data, timedata, name);
 
-        if (data.members) timedata = _this.members(data, timedata, config, privilage);
+        // if (data.members) timedata = _this.members(data, timedata, config, privilage);
 
-        if (data.aggs && data.aggs.ratios) _this.pies(data);
+        // if (data.aggs && data.aggs.ratios) _this.pies(data);
 
         return timedata;
       }
